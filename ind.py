@@ -30,7 +30,16 @@ class rSeries(object):
     
     @property
     def std(self):
-        return self.series.std()
+        return self.series.std(skipna=True)
+    
+    @property
+    def cumulative_max(self):
+        return self.cumulative_return.cummax(skipna=True)
+    
+    @property
+    def drawdowns(self):
+        return self.cumulative_return/self.cumulative_max - 1
+        
 
 
 if __name__ == '__main__':
@@ -42,7 +51,7 @@ if __name__ == '__main__':
     test_return_array[12] = np.nan
     test_series = pd.Series(test_return_array)
     tools = rSeries(test_series)
-    print(tools.cumulative_return)
+    print(tools.drawdowns)
     
     test_frame = pd.DataFrame((np.random.rand(20,2) - 0.4)/10)
-    print(test_frame.apply(lambda x:rSeries(x).mean_return, axis=0))
+    print(test_frame.apply(lambda x:rSeries(x).drawdowns, axis=0))
