@@ -102,29 +102,29 @@ class indicators():
                                    arr = return_arr)
        
     @staticmethod
-    def down_side_risk(return_arr, multiplier=252, axis=0):
-        returns = return_arr.copy()
+    def down_side_risk(return_arr, risk_free_arr=0, multiplier=252, axis=0):
+        returns = return_arr - risk_free_arr
         returns[returns>0] = 0
-        return np.nanstd(returns, axis = axis) * np.sqrt(multiplier)
+        return np.nansum(np.power(returns, 2), axis = axis) * np.sqrt(multiplier) 
     
     @staticmethod
-    def up_side_risk(return_arr, multiplier=252, axis=0):
-        returns = return_arr.copy()
+    def up_side_risk(return_arr, risk_free_arr=0, multiplier=252, axis=0):
+        returns = return_arr - risk_free_arr
         returns[returns<0] = 0
-        return np.nanstd(returns, axis = axis) * np.sqrt(multiplier) 
+        return np.nansum(np.power(returns, 2), axis = axis) * np.sqrt(multiplier) 
    
     @staticmethod
     def skewness(return_arr, axis=0):
-        return np.array(stats.skew(return_arr, axis = axis))
+        return np.array(stats.skew(return_arr, axis = axis, nan_policy = 'omit'))
     
     @staticmethod
     def kurtosis(return_arr, axis=0):
-        return np.array(stats.kurtosis(return_arr, axis = axis))
+        return np.array(stats.kurtosis(return_arr, axis = axis, nan_policy = 'omit'))
     
     @staticmethod
     def winning_ratio(return_arr, axis=0):
-        winning = np.sum(return_arr, axis = axis)
-        total = return_arr.shape[1:]        
+        winning = np.nansum(return_arr>0, axis = axis)
+        total = return_arr.shape[axis]        
         return np.divide(winning, total)
   
     @staticmethod
@@ -139,9 +139,7 @@ class indicators():
     @staticmethod
     def tailRisk(return_arr, alpha=0.05, axis=0):
         VaR = indicators.VaR(return_arr, alpha=alpha, axis=axis)
-        arr = return_arr.copy()
-        arr[arr>VaR] = np.nan
-        return np.nanstd(arr, axis=axis)
+        return np.nanstd(ma.array(return_arr, mask = return_arr>VaR), axis=axis)
         
     @staticmethod
     def annualized_absolute_return(return_arr, risk_free_arr=0, multiplier=252, axis=0):
