@@ -36,8 +36,8 @@ class indicators(object):
         multiplier = np.sqrt(annnualization_multiplier)
         return np.nanstd(return_arr, axis=axis)*multiplier
     
-    @staticmethod
-    def 
+#    @staticmethod
+#    def 
 
 if __name__ == '__main__':
     
